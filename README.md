@@ -36,3 +36,8 @@ Then add `LiquidGlassBackport` to your target dependencies:
 
 `LiquidGlassBackport` re-exports `Backport`, `ButtonStyleBackport`, and
 `GlassBackport` through package linking, so you can keep one top-level dependency.
+
+## Apple Liquid Glass docs
+
+- [Liquid Glass overview](https://developer.apple.com/documentation/technologyoverviews/liquid-glass)
+- [Adopting Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass)
