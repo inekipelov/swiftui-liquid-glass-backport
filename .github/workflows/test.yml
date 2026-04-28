@@ -1,0 +1,151 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SCHEME: swiftui-liquid-glass-backport
+
+jobs:
+  swiftpm:
+    name: SwiftPM tests (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - macos-15
+          - macos-26
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for xcode in \
+            /Applications/Xcode_26.4.app \
+            /Applications/Xcode_26.4.1.app \
+            /Applications/Xcode_26.3.app \
+            /Applications/Xcode_26.2.app \
+            /Applications/Xcode_26.1.app \
+            /Applications/Xcode_26.0.app \
+            /Applications/Xcode.app
+          do
+            if [ -d "$xcode" ]; then
+              sudo xcode-select -s "$xcode/Contents/Developer"
+              break
+            fi
+          done
+
+          xcodebuild -version
+          swift --version
+
+      - name: Build package
+        run: swift build -v
+
+      - name: Run SwiftPM tests
+        run: swift test -v
+
+  apple-platform-tests:
+    name: Xcode tests (${{ matrix.name }})
+    runs-on: macos-26
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS 26
+            destination: platform=macOS
+          - name: iOS 26 simulator
+            destination: platform=iOS Simulator,name=iPhone 17
+          - name: tvOS 26 simulator
+            destination: platform=tvOS Simulator,name=Apple TV
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 26.4
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for xcode in \
+            /Applications/Xcode_26.4.app \
+            /Applications/Xcode_26.4.1.app \
+            /Applications/Xcode_26.3.app \
+            /Applications/Xcode.app
+          do
+            if [ -d "$xcode" ]; then
+              sudo xcode-select -s "$xcode/Contents/Developer"
+              break
+            fi
+          done
+
+          xcodebuild -version
+          xcodebuild -showsdks
+
+      - name: Run xcodebuild tests
+        run: |
+          xcodebuild test \
+            -scheme "$SCHEME" \
+            -destination "${{ matrix.destination }}" \
+            CODE_SIGNING_ALLOWED=NO
+
+  apple-platform-builds:
+    name: Xcode build (${{ matrix.name }})
+    runs-on: macos-26
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: watchOS 26 simulator
+            destination: generic/platform=watchOS Simulator
+          - name: visionOS 26 simulator
+            destination: generic/platform=visionOS Simulator
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 26.4
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for xcode in \
+            /Applications/Xcode_26.4.app \
+            /Applications/Xcode_26.4.1.app \
+            /Applications/Xcode_26.3.app \
+            /Applications/Xcode.app
+          do
+            if [ -d "$xcode" ]; then
+              sudo xcode-select -s "$xcode/Contents/Developer"
+              break
+            fi
+          done
+
+          xcodebuild -version
+          xcodebuild -showsdks
+
+      - name: Build platform target
+        run: |
+          xcodebuild build \
+            -scheme "$SCHEME" \
+            -destination "${{ matrix.destination }}" \
+            CODE_SIGNING_ALLOWED=NO

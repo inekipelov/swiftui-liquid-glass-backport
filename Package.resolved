@@ -1,0 +1,33 @@
+{
+  "originHash" : "b1bc54e89ec3b206e39c4edb7ac662585cb77c74345a592c6ca24d53325324e1",
+  "pins" : [
+    {
+      "identity" : "swift-backport-pattern",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/inekipelov/swift-backport-pattern.git",
+      "state" : {
+        "revision" : "4f91be0ee442fffbe5ac9b6ca2028f43c8408d44",
+        "version" : "0.2.0"
+      }
+    },
+    {
+      "identity" : "swiftui-button-style-backport",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/inekipelov/swiftui-button-style-backport.git",
+      "state" : {
+        "revision" : "83c4240c32136c87370c6ead615cc9ce1f9cad92",
+        "version" : "0.2.1"
+      }
+    },
+    {
+      "identity" : "swiftui-glass-type-backport",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/inekipelov/swiftui-glass-type-backport.git",
+      "state" : {
+        "revision" : "78b0e0628f5c19404f59d1cae968f95f6793f6b8",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}
