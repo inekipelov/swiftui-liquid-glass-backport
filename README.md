@@ -3,9 +3,8 @@
 `LiquidGlassBackport` is a tiny Swift Package that composes Liquid Glass
 backports behind one import.
 
-It builds on [`swift-backport-pattern`](https://github.com/inekipelov/swift-backport-pattern),
-[`swiftui-glass-type-backport`](https://github.com/inekipelov/swiftui-glass-type-backport),
-and [`swiftui-button-style-backport`](https://github.com/inekipelov/swiftui-button-style-backport).
+It builds on [`swift-backport-pattern`](https://github.com/inekipelov/swift-backport-pattern)
+and provides its Liquid Glass configuration and view backports locally.
 
 <p align="center">
   <a href="https://swift.org"><img src="https://img.shields.io/badge/Swift-6.0+-F05138?logo=swift&logoColor=white" alt="Swift 6.0+"></a>
@@ -34,8 +33,7 @@ Then add `LiquidGlassBackport` to your target dependencies:
 .product(name: "LiquidGlassBackport", package: "swiftui-liquid-glass-backport")
 ```
 
-`LiquidGlassBackport` re-exports `Backport`, `ButtonStyleBackport`, and
-`GlassBackport` through package linking, so you can keep one top-level dependency.
+`LiquidGlassBackport` re-exports `Backport`
 
 ## Apple Liquid Glass docs
 

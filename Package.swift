@@ -18,17 +18,13 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/inekipelov/swift-backport-pattern.git", from: "0.2.0"),
-        .package(url: "https://github.com/inekipelov/swiftui-button-style-backport.git", from: "0.2.1"),
-        .package(url: "https://github.com/inekipelov/swiftui-glass-type-backport.git", from: "1.0.0")
+        .package(url: "https://github.com/inekipelov/swift-backport-pattern.git", from: "0.2.0")
     ],
     targets: [
         .target(
             name: "LiquidGlassBackport",
             dependencies: [
-                .product(name: "Backport", package: "swift-backport-pattern"),
-                .product(name: "ButtonStyleBackport", package: "swiftui-button-style-backport"),
-                .product(name: "GlassBackport", package: "swiftui-glass-type-backport")
+                .product(name: "Backport", package: "swift-backport-pattern")
             ]
         ),
         .testTarget(
