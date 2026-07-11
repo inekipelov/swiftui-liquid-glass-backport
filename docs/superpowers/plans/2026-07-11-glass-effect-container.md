@@ -20,7 +20,7 @@
 **Files:**
 - Modify: `Tests/LiquidGlassBackportTests/LiquidGlassBackportTests.swift`
 
-- [ ] **Step 1: Add the failing compile-time tests**
+- [x] **Step 1: Add the failing compile-time tests**
 
 Append the following tests inside the existing `#if canImport(SwiftUI)` block:
 
@@ -50,7 +50,7 @@ func glassEffectContainerSupportsSpacingAndMultipleChildren() {
 }
 ```
 
-- [ ] **Step 2: Run the tests and verify the API is missing**
+- [x] **Step 2: Run the tests and verify the API is missing**
 
 Run:
 
@@ -67,7 +67,7 @@ Expected: compilation fails because `Backported` has no member type named
 - Create: `Sources/LiquidGlassBackport/Backported+GlassEffectContainer.swift`
 - Test: `Tests/LiquidGlassBackportTests/LiquidGlassBackportTests.swift`
 
-- [ ] **Step 1: Add the minimal container implementation**
+- [x] **Step 1: Add the minimal container implementation**
 
 Create `Sources/LiquidGlassBackport/Backported+GlassEffectContainer.swift` with:
 
@@ -110,7 +110,7 @@ public extension Backported {
 This exposes only Apple's `spacing` and `content` inputs. The visionOS compile
 guard is required because Apple marks its native type unavailable there.
 
-- [ ] **Step 2: Run Swift Testing**
+- [x] **Step 2: Run Swift Testing**
 
 Run:
 
@@ -121,7 +121,7 @@ swift test
 Expected: all three Swift Testing tests pass: the existing glass-effect test and
 the two new container API tests.
 
-- [ ] **Step 3: Check formatting and unintended changes**
+- [x] **Step 3: Check formatting and unintended changes**
 
 Run:
 
@@ -133,7 +133,7 @@ git status --short
 Expected: no whitespace errors; only the new source file and modified test file
 appear as implementation changes.
 
-- [ ] **Step 4: Commit the implementation**
+- [x] **Step 4: Commit the implementation**
 
 ```bash
 git add Sources/LiquidGlassBackport/Backported+GlassEffectContainer.swift \
@@ -148,7 +148,7 @@ Expected: one commit containing the source and tests.
 **Files:**
 - Verify: `.github/workflows/test.yml`
 
-- [ ] **Step 1: Build the macOS destination locally**
+- [x] **Step 1: Build the macOS destination locally**
 
 Run:
 
@@ -161,7 +161,7 @@ xcodebuild build \
 
 Expected: `** BUILD SUCCEEDED **`.
 
-- [ ] **Step 2: Verify the existing CI matrix covers the required branches**
+- [x] **Step 2: Verify the existing CI matrix covers the required branches**
 
 Run:
 
@@ -172,7 +172,7 @@ rg -n "macOS 26|iOS 26 simulator|tvOS 26 simulator|watchOS 26 simulator|visionOS
 
 Expected: five matrix entries. No workflow changes are required.
 
-- [ ] **Step 3: Run final package verification**
+- [x] **Step 3: Run final package verification**
 
 Run:
 
