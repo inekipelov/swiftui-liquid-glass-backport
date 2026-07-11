@@ -63,4 +63,17 @@ func buttonStyleBackportExposesSystemFallbackStyles() {
     _ = Button("Prominent") {}
         .buttonStyle(.backport.borderedProminent)
 }
+
+@Test("Button style backport exposes glass styles")
+@MainActor
+func buttonStyleBackportExposesGlassStyles() {
+    _ = Button("Glass") {}
+        .buttonStyle(.backport.glass)
+    _ = Button("Prominent") {}
+        .buttonStyle(.backport.glassProminent)
+    _ = Button("Configured") {}
+        .buttonStyle(
+            .backport.glass(.regular.interactive(true).tint(.blue))
+        )
+}
 #endif
