@@ -17,7 +17,7 @@ func glassEffectBackportIsCallable() {
         _ = glass.color
         _ = glass.edgeColor
         _ = glass.shadowColor
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 10.0, visionOS 1.0, *) {
             _ = glass.material
         }
 

@@ -12,11 +12,7 @@ public extension Backport where Content: View {
         in shape: S = Capsule()
     ) -> some View {
         #if os(visionOS)
-        if #available(visionOS 26.0, *) {
-            content.glassEffect(in: shape)
-        } else {
-            content.legacyGlassEffect(glass, in: shape)
-        }
+        content
         #else
         if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
             content.glassEffect(glass.glass, in: shape)
@@ -33,7 +29,7 @@ private extension View {
     func legacyGlassEffect<S: Shape>(_ glass: Backported.Glass, in shape: S) -> some View {
         if glass.isIdentity {
             self
-        } else if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+        } else if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 10.0, visionOS 1.0, *) {
             if let material = glass.material {
                 background {
                     shape
