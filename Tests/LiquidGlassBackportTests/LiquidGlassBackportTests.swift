@@ -28,4 +28,28 @@ func glassEffectBackportIsCallable() {
         _ = view
     }
 }
+
+@Test("GlassEffectContainer supports default spacing")
+@MainActor
+func glassEffectContainerSupportsDefaultSpacing() {
+    let container = Backported.GlassEffectContainer {
+        Text("Glass")
+            .backport.glassEffect()
+    }
+
+    _ = container
+}
+
+@Test("GlassEffectContainer supports explicit spacing and multiple children")
+@MainActor
+func glassEffectContainerSupportsSpacingAndMultipleChildren() {
+    let container = Backported.GlassEffectContainer(spacing: 16) {
+        Text("First")
+            .backport.glassEffect()
+        Text("Second")
+            .backport.glassEffect()
+    }
+
+    _ = container
+}
 #endif
