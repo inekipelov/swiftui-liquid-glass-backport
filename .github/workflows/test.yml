@@ -16,9 +16,36 @@ env:
   SCHEME: swiftui-liquid-glass-backport
 
 jobs:
+  ci-gate:
+    name: CI gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      code: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.code == 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect code changes
+        id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            code:
+              - 'Sources/**'
+              - 'Tests/**'
+              - 'Package.swift'
+              - 'Package.resolved'
+              - '.github/workflows/test.yml'
+
   swiftpm:
     name: SwiftPM tests (${{ matrix.runner }})
     runs-on: ${{ matrix.runner }}
+    needs: ci-gate
+    if: needs.ci-gate.outputs.code == 'true'
 
     strategy:
       fail-fast: false
@@ -63,6 +90,8 @@ jobs:
   apple-platform-tests:
     name: Xcode tests (${{ matrix.name }})
     runs-on: macos-26
+    needs: ci-gate
+    if: needs.ci-gate.outputs.code == 'true'
 
     strategy:
       fail-fast: false
@@ -109,6 +138,8 @@ jobs:
   apple-platform-builds:
     name: Xcode build (${{ matrix.name }})
     runs-on: macos-26
+    needs: ci-gate
+    if: needs.ci-gate.outputs.code == 'true'
 
     strategy:
       fail-fast: false
