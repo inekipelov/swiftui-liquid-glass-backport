@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: test-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -16,8 +20,8 @@ env:
   SCHEME: swiftui-liquid-glass-backport
 
 jobs:
-  ci-gate:
-    name: CI gate
+  change-detection:
+    name: Change detection
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -41,11 +45,15 @@ jobs:
               - 'Package.resolved'
               - '.github/workflows/test.yml'
 
+      - name: Report change detection
+        run: |
+          echo "Code changes detected: ${{ steps.filter.outputs.code }}"
+
   swiftpm:
     name: SwiftPM tests (${{ matrix.runner }})
     runs-on: ${{ matrix.runner }}
-    needs: ci-gate
-    if: needs.ci-gate.outputs.code == 'true'
+    needs: change-detection
+    if: needs.change-detection.outputs.code == 'true'
 
     strategy:
       fail-fast: false
@@ -90,8 +98,8 @@ jobs:
   apple-platform-tests:
     name: Xcode tests (${{ matrix.name }})
     runs-on: macos-26
-    needs: ci-gate
-    if: needs.ci-gate.outputs.code == 'true'
+    needs: change-detection
+    if: needs.change-detection.outputs.code == 'true'
 
     strategy:
       fail-fast: false
@@ -138,8 +146,8 @@ jobs:
   apple-platform-builds:
     name: Xcode build (${{ matrix.name }})
     runs-on: macos-26
-    needs: ci-gate
-    if: needs.ci-gate.outputs.code == 'true'
+    needs: change-detection
+    if: needs.change-detection.outputs.code == 'true'
 
     strategy:
       fail-fast: false
