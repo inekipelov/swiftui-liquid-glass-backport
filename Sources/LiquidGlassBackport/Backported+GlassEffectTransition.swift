@@ -28,7 +28,7 @@ public extension Backported {
 
         #if !os(visionOS)
         @available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *)
-        var swiftUITransition: SwiftUI.GlassEffectTransition {
+        var transition: SwiftUI.GlassEffectTransition {
             switch variant {
             case .identity:
                 .identity

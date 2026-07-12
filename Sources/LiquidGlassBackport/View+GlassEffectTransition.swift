@@ -14,7 +14,7 @@ public extension Backport where Content: View {
         content
         #else
         if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
-            content.glassEffectTransition(transition.swiftUITransition)
+            content.glassEffectTransition(transition.transition)
         } else {
             content
         }
