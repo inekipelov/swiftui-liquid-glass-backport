@@ -107,16 +107,19 @@ git commit -m "ci(release): require one version label"
 
 **Files:**
 - Create: `.github/workflows/release.yml`
+- Create: `scripts/plan-calver.sh`
 - Modify: `scripts/test-release-scripts.sh`
 
 **Interfaces:**
-- Consumes: all three release scripts.
-- Produces: annotated numeric tag and GitHub Release for merged release-bearing PRs.
-- Produces: manual dry-run inputs `version_label`, `current_version`, and `target_sha`.
+- Consumes: the label, version, tag, and ordered planning scripts.
+- Produces: annotated numeric tags and GitHub Releases for all unreleased,
+  release-bearing pull requests in first-parent `main` history.
+- Produces: a manual dry-run that reconciles current `main` without writes.
 
 - [ ] **Step 1: Add dry-run regression cases**
 
-Verify the script outputs required by a manual workflow run: selected label, optional current version, calculated version, and an empty calculated version for `version:none`.
+Verify ordered calculation across patch, none, and minor candidates both with
+and without an existing release version.
 
 - [ ] **Step 2: Add `.github/workflows/release.yml`**
 
@@ -124,13 +127,15 @@ The workflow must:
 
 - Trigger on merged PRs to `main` and manual dispatch.
 - Use `concurrency.group: release-main` and `cancel-in-progress: false`.
-- Checkout the exact merge SHA with complete tag history.
-- Revalidate the version label.
-- Verify the target SHA is contained in `origin/main`.
+- Checkout trusted `main` with complete tag history.
+- Reconcile missing GitHub Releases for existing canonical tags.
+- Enumerate unreleased pull requests in first-parent history order.
+- Revalidate every selected version label.
 - Find the latest canonical tag after entering the concurrency group.
+- Calculate all pending versions sequentially with `scripts/plan-calver.sh`.
 - Fail when a calculated tag already exists.
 - Print a report before writes.
-- Skip writes during manual dispatch and for `version:none`.
+- Skip writes during manual dispatch and omit `version:none` candidates.
 - Configure a tag identity, create an annotated tag, push it, and call `gh release create --verify-tag --generate-notes`.
 
 - [ ] **Step 3: Validate workflow syntax and expressions**

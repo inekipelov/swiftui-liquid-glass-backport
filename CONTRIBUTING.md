@@ -104,10 +104,10 @@ When a pull request adds or changes public API:
 ## Release automation
 
 Release automation runs only after a pull request is merged into `main`. It
-serializes publication, calculates the next calendar version from the latest
-reachable release tag, tags the exact merge commit, and generates GitHub
-release notes.
+serializes publication, reconciles every unreleased pull request in `main`
+history order, tags each release-bearing merge commit, and generates GitHub
+release notes. This reconciliation preserves pending releases when GitHub
+replaces an older queued workflow run.
 
-Manual workflow dispatch is dry-run only. It reports the selected label,
-target commit, current version, and calculated version without creating a tag
-or GitHub Release.
+Manual workflow dispatch is dry-run only. It reports pending labels, target
+commits, and calculated versions without creating a tag or GitHub Release.

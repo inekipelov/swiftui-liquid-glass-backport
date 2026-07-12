@@ -29,9 +29,28 @@ assert_failure() {
     fi
 }
 
+assert_stdin_output() {
+    local expected=$1
+    local input=$2
+    shift 2
+
+    local actual
+    if ! actual=$(printf '%s' "$input" | "$@" 2>&1); then
+        printf 'Expected success from %s, got:\n%s\n' "$*" "$actual" >&2
+        failures=$((failures + 1))
+        return
+    fi
+
+    if [[ "$actual" != "$expected" ]]; then
+        printf 'Expected %q, got %q from %s\n' "$expected" "$actual" "$*" >&2
+        failures=$((failures + 1))
+    fi
+}
+
 label_script="$root_dir/scripts/version-label.sh"
 next_script="$root_dir/scripts/next-calver.sh"
 latest_script="$root_dir/scripts/latest-calver.sh"
+plan_script="$root_dir/scripts/plan-calver.sh"
 
 assert_failure "$label_script"
 assert_failure "$label_script" version:major version:minor
@@ -59,6 +78,15 @@ assert_output 26.10.2 "$latest_script" notes 26.2.9 26.10.2
 assert_output 27.0.0 "$latest_script" 26.10.2 27.0.0 26.9.9
 assert_failure "$latest_script" 26.0
 assert_failure "$latest_script" 26.0.0 26.0.0
+
+assert_stdin_output \
+    $'aaaa\tversion:patch\t26.0.0\ncccc\tversion:minor\t26.1.0' \
+    $'aaaa\tversion:patch\nbbbb\tversion:none\ncccc\tversion:minor\n' \
+    "$plan_script"
+assert_stdin_output \
+    $'aaaa\tversion:patch\t26.4.4\ncccc\tversion:minor\t26.5.0' \
+    $'aaaa\tversion:patch\nbbbb\tversion:none\ncccc\tversion:minor\n' \
+    "$plan_script" 26.4.3
 
 if ((failures > 0)); then
     printf 'Release script tests failed: %d\n' "$failures" >&2

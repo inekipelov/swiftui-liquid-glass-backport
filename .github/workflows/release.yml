@@ -7,24 +7,6 @@ on:
     types:
       - closed
   workflow_dispatch:
-    inputs:
-      version_label:
-        description: Version label to evaluate without publishing
-        required: true
-        type: choice
-        options:
-          - version:major
-          - version:minor
-          - version:patch
-          - version:none
-      current_version:
-        description: Optional current version override for dry-run
-        required: false
-        type: string
-      target_sha:
-        description: Optional main commit to evaluate
-        required: false
-        type: string
 
 concurrency:
   group: release-main
@@ -44,88 +26,100 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' }}
-      INPUT_CURRENT_VERSION: ${{ inputs.current_version }}
-      INPUT_VERSION_LABEL: ${{ inputs.version_label }}
-      PR_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
-      TARGET_SHA: ${{ github.event.pull_request.merge_commit_sha || inputs.target_sha || github.sha }}
+      GH_TOKEN: ${{ github.token }}
 
     steps:
-      - name: Checkout release target
-        uses: actions/checkout@v4
+      - name: Checkout trusted main branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
-          ref: ${{ env.TARGET_SHA }}
+          ref: main
 
-      - name: Verify target belongs to main
+      - name: Resolve current release
+        id: current
         shell: bash
         run: |
           set -euo pipefail
 
-          git fetch origin main
-          git merge-base --is-ancestor "$TARGET_SHA" origin/main
+          git fetch origin main --tags
+          mapfile -t release_tags < <(git tag --merged origin/main)
+          current_version=$(scripts/latest-calver.sh "${release_tags[@]}")
+          echo "version=$current_version" >> "$GITHUB_OUTPUT"
+          echo "Current release: ${current_version:-none}"
 
-      - name: Resolve version label
-        id: label
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            labels=("$INPUT_VERSION_LABEL")
-          else
-            mapfile -t labels < <(jq -r '.[]' <<< "$PR_LABELS_JSON")
-          fi
-
-          selected_label=$(scripts/version-label.sh "${labels[@]}")
-          echo "label=$selected_label" >> "$GITHUB_OUTPUT"
-          echo "Selected version label: $selected_label"
-
-      - name: Calculate release version
-        id: version
+      - name: Reconcile GitHub Releases
         env:
-          VERSION_LABEL: ${{ steps.label.outputs.label }}
+          CURRENT_VERSION: ${{ steps.current.outputs.version }}
         shell: bash
         run: |
           set -euo pipefail
 
-          if [[ "$VERSION_LABEL" == "version:none" ]]; then
-            echo "current=" >> "$GITHUB_OUTPUT"
-            echo "version=" >> "$GITHUB_OUTPUT"
-            echo "existing=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          mapfile -t release_tags < <(git tag --merged origin/main)
+          for tag in "${release_tags[@]}"; do
+            if [[ ! "$tag" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+              continue
+            fi
 
-          mapfile -t target_tags < <(git tag --points-at "$TARGET_SHA")
-          existing_version=$(scripts/latest-calver.sh "${target_tags[@]}")
+            if gh release view "$tag" >/dev/null 2>&1; then
+              continue
+            fi
 
-          if [[ -n "$INPUT_CURRENT_VERSION" ]]; then
-            current_version=$INPUT_CURRENT_VERSION
+            target_sha=$(git rev-list -n 1 "$tag")
+            if [[ "$DRY_RUN" == "true" ]]; then
+              echo "Missing GitHub Release: $tag at $target_sha"
+              continue
+            fi
+
+            gh release create "$tag" \
+              --generate-notes \
+              --target "$target_sha" \
+              --title "$tag" \
+              --verify-tag
+          done
+
+      - name: Collect unreleased pull requests
+        id: candidates
+        env:
+          CURRENT_VERSION: ${{ steps.current.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          candidates_file="$RUNNER_TEMP/release-candidates.tsv"
+          plan_file="$RUNNER_TEMP/release-plan.tsv"
+          : > "$candidates_file"
+
+          if [[ -n "$CURRENT_VERSION" ]]; then
+            revision_range="$CURRENT_VERSION..origin/main"
           else
-            parent_sha=$(git rev-parse "$TARGET_SHA^")
-            mapfile -t previous_tags < <(git tag --merged "$parent_sha")
-            current_version=$(scripts/latest-calver.sh "${previous_tags[@]}")
+            revision_range="origin/main"
           fi
 
-          next_version=$(scripts/next-calver.sh "$VERSION_LABEL" "$current_version")
+          mapfile -t commits < <(git rev-list --first-parent --reverse "$revision_range")
+          for target_sha in "${commits[@]}"; do
+            pulls_json=$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/$GITHUB_REPOSITORY/commits/$target_sha/pulls")
+            pull_request=$(jq \
+              --arg sha "$target_sha" \
+              '[.[] | select(.merged_at != null and .base.ref == "main" and .merge_commit_sha == $sha)] | first // empty' \
+              <<< "$pulls_json")
 
-          if [[ -n "$existing_version" && "$existing_version" != "$next_version" ]]; then
-            echo "Target already has unexpected release tag $existing_version" >&2
-            exit 1
-          fi
+            if [[ -z "$pull_request" ]]; then
+              continue
+            fi
 
-          echo "current=$current_version" >> "$GITHUB_OUTPUT"
-          echo "version=$next_version" >> "$GITHUB_OUTPUT"
-          if [[ -n "$existing_version" ]]; then
-            echo "existing=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "existing=false" >> "$GITHUB_OUTPUT"
-          fi
+            mapfile -t labels < <(jq -r '.labels[].name' <<< "$pull_request")
+            selected_label=$(scripts/version-label.sh "${labels[@]}")
+            printf '%s\t%s\n' "$target_sha" "$selected_label" >> "$candidates_file"
+          done
+
+          scripts/plan-calver.sh "$CURRENT_VERSION" < "$candidates_file" > "$plan_file"
+          echo "plan_file=$plan_file" >> "$GITHUB_OUTPUT"
 
       - name: Report release plan
         env:
-          CURRENT_VERSION: ${{ steps.version.outputs.current }}
-          NEXT_VERSION: ${{ steps.version.outputs.version }}
-          VERSION_LABEL: ${{ steps.label.outputs.label }}
+          PLAN_FILE: ${{ steps.candidates.outputs.plan_file }}
         shell: bash
         run: |
           set -euo pipefail
@@ -133,47 +127,40 @@ jobs:
           {
             echo "### Release plan"
             echo
-            echo "- Label: \`$VERSION_LABEL\`"
-            echo "- Target: \`$TARGET_SHA\`"
-            echo "- Current version: \`${CURRENT_VERSION:-none}\`"
-            echo "- Next version: \`${NEXT_VERSION:-none}\`"
             echo "- Dry-run: \`$DRY_RUN\`"
+            if [[ ! -s "$PLAN_FILE" ]]; then
+              echo "- No release-bearing pull requests found."
+            else
+              while IFS=$'\t' read -r target_sha version_label next_version; do
+                echo "- \`$next_version\` from \`$target_sha\` ($version_label)"
+              done < "$PLAN_FILE"
+            fi
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Create annotated tag
-        if: env.DRY_RUN != 'true' && steps.version.outputs.version != '' && steps.version.outputs.existing != 'true'
+      - name: Publish planned releases
+        if: env.DRY_RUN != 'true'
         env:
-          NEXT_VERSION: ${{ steps.version.outputs.version }}
+          PLAN_FILE: ${{ steps.candidates.outputs.plan_file }}
         shell: bash
         run: |
           set -euo pipefail
-
-          if git rev-parse --verify --quiet "refs/tags/$NEXT_VERSION"; then
-            echo "Release tag already exists: $NEXT_VERSION" >&2
-            exit 1
-          fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$NEXT_VERSION" "$TARGET_SHA" -m "Release $NEXT_VERSION"
-          git push origin "refs/tags/$NEXT_VERSION"
 
-      - name: Publish GitHub Release
-        if: env.DRY_RUN != 'true' && steps.version.outputs.version != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-          NEXT_VERSION: ${{ steps.version.outputs.version }}
-        shell: bash
-        run: |
-          set -euo pipefail
+          while IFS=$'\t' read -r target_sha version_label next_version; do
+            echo "Publishing $next_version from $target_sha ($version_label)"
 
-          if gh release view "$NEXT_VERSION" >/dev/null 2>&1; then
-            echo "GitHub Release already exists: $NEXT_VERSION"
-            exit 0
-          fi
+            if git rev-parse --verify --quiet "refs/tags/$next_version"; then
+              echo "Release tag already exists: $next_version" >&2
+              exit 1
+            fi
 
-          gh release create "$NEXT_VERSION" \
-            --generate-notes \
-            --target "$TARGET_SHA" \
-            --title "$NEXT_VERSION" \
-            --verify-tag
+            git tag -a "$next_version" "$target_sha" -m "Release $next_version"
+            git push origin "refs/tags/$next_version"
+            gh release create "$next_version" \
+              --generate-notes \
+              --target "$target_sha" \
+              --title "$next_version" \
+              --verify-tag
+          done < "$PLAN_FILE"

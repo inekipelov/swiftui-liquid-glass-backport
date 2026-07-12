@@ -59,22 +59,29 @@ removed as part of a later platform-generation release.
 
 ## Release Workflow
 
-The release workflow listens for merged pull requests targeting `main` and
-uses the merged commit SHA as the exact release target.
+The release workflow listens for merged pull requests targeting `main`. Each
+run reconciles every merged pull request after the latest release tag in
+first-parent `main` history order. This makes publication independent of the
+order in which GitHub schedules concurrent workflow events.
 
 For `version:major`, `version:minor`, and `version:patch`, the workflow:
 
-1. Serializes releases through a single non-cancelling concurrency group.
-2. Fetches all repository tags after entering the concurrency group.
-3. Finds the latest valid calendar-version tag.
-4. Uses `26.0.0` when no release tag exists; otherwise calculates the next
-   version from the pull request label.
-5. Fails if the calculated tag already exists.
-6. Creates and pushes an annotated Git tag on the pull request merge commit.
-7. Publishes a GitHub Release from that tag with generated release notes.
+1. Serializes release workers through a single non-cancelling concurrency
+   group.
+2. Fetches `main` and all repository tags after entering the concurrency
+   group.
+3. Restores a missing GitHub Release when a previous run pushed its tag but
+   failed before publication completed.
+4. Finds merged pull requests after the latest valid calendar-version tag.
+5. Validates each pull request label and calculates versions in `main` history
+   order.
+6. Uses `26.0.0` when no release tag exists.
+7. Creates an annotated tag on each release-bearing pull request merge commit.
+8. Publishes a GitHub Release from each new tag with generated release notes.
 
-For `version:none`, the workflow performs validation and exits without write
-operations.
+A pull request labeled `version:none` never receives a tag or GitHub Release.
+It is omitted from the release plan while later release-bearing pull requests
+remain eligible for publication.
 
 Canonical release tags contain only the numeric version, for example
 `26.0.0`, without a `v` prefix. This keeps Git tags, GitHub Releases, and Swift
@@ -91,9 +98,10 @@ only the permissions required to read pull request metadata and write tags and
 GitHub Releases. Untrusted event values are passed through environment
 variables instead of being interpolated directly into shell source.
 
-The release workflow verifies that the merge commit belongs to `main` before
-creating a tag. A single concurrency group prevents two merged pull requests
-from calculating the same next version.
+The release workflow derives targets only from first-parent `main` history.
+The reconciliation model ensures that a newer pending run can process earlier
+merged pull requests if GitHub replaces another pending run in the same
+concurrency group.
 
 ## Contribution Guide
 
@@ -115,6 +123,7 @@ Implementation will add or update:
 
 - `.github/workflows/version-label.yml`
 - `.github/workflows/release.yml`
+- `scripts/plan-calver.sh`
 - `CONTRIBUTING.md`
 - `README.md`
 - `ROADMAP.md`
@@ -131,6 +140,7 @@ Verification must cover:
 - `version:none` producing no version output.
 - Bootstrap calculation producing `26.0.0` when no prior tag exists.
 - Major, minor, and patch calculations from an existing version.
+- Ordered calculation for multiple unreleased pull requests.
 - Rejection of malformed and duplicate tags.
 - YAML syntax and workflow expression validation.
 - A dry-run mode that reports the selected label, merge SHA, and calculated
