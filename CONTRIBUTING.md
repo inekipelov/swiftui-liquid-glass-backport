@@ -78,7 +78,8 @@ bash scripts/test-release-scripts.sh
 ```
 
 The pull request must pass the repository's GitHub Actions matrix before
-merge.
+merge. The required `Test matrix` check aggregates the platform jobs, while
+the required `Version label` check validates the release category.
 
 ## Commits
 

@@ -30,6 +30,10 @@ A dedicated required check rejects pull requests with no version label or
 with more than one version label. The release workflow repeats this validation
 after merge as a defense-in-depth check.
 
+An aggregate `Test matrix` check is also required. It succeeds only when all
+platform jobs pass for source changes, while documentation-only changes may
+skip those jobs after successful change detection.
+
 ## Calendar Versioning
 
 Published versions use this format:
@@ -59,10 +63,11 @@ removed as part of a later platform-generation release.
 
 ## Release Workflow
 
-The release workflow listens for merged pull requests targeting `main`. Each
-run reconciles every merged pull request after the latest release tag in
-first-parent `main` history order. This makes publication independent of the
-order in which GitHub schedules concurrent workflow events.
+The release workflow listens for pushes to protected `main`, which can only
+arrive through pull requests. Each run reconciles every merged pull request
+after the latest release tag in first-parent `main` history order. This makes
+the first release self-bootstrapping and publication independent of the order
+in which GitHub schedules concurrent workflow events.
 
 For `version:major`, `version:minor`, and `version:patch`, the workflow:
 
@@ -89,9 +94,10 @@ Package Manager versions identical.
 
 ## Security And Permissions
 
-The workflows use `pull_request_target` only for metadata-driven operations
-whose definitions come from the trusted default branch. They never execute or
-source code from an unmerged pull request.
+The version-label workflow uses `pull_request_target` only for metadata-driven
+operations whose definitions come from the trusted default branch. Workflows
+never execute or source code from an unmerged pull request. The release
+workflow runs only after protected `main` has advanced.
 
 The label check receives read-only pull request metadata. The release job has
 only the permissions required to read pull request metadata and write tags and

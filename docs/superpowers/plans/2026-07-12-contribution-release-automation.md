@@ -125,7 +125,7 @@ and without an existing release version.
 
 The workflow must:
 
-- Trigger on merged PRs to `main` and manual dispatch.
+- Trigger on pushes to protected `main` and manual dispatch.
 - Use `concurrency.group: release-main` and `cancel-in-progress: false`.
 - Checkout trusted `main` with complete tag history.
 - Reconcile missing GitHub Releases for existing canonical tags.
