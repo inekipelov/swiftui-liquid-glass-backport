@@ -76,4 +76,37 @@ func buttonStyleBackportExposesGlassStyles() {
             .backport.glass(.regular.interactive(true).tint(.blue))
         )
 }
+
+private struct GlassEffectIDTestIdentifier: Hashable, Sendable {
+    let rawValue: Int
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+private struct GlassEffectIDCallSite: View {
+    @Namespace private var namespace
+
+    var body: some View {
+        VStack {
+            Text("String")
+                .backport.glassEffectID("string", in: namespace)
+            Text("Custom")
+                .backport.glassEffectID(
+                    GlassEffectIDTestIdentifier(rawValue: 1),
+                    in: namespace
+                )
+
+            let identifier: String? = nil
+            Text("Nil")
+                .backport.glassEffectID(identifier, in: namespace)
+        }
+    }
+}
+
+@Test("Backport glassEffectID(_:in:) accepts supported identifiers")
+@MainActor
+func glassEffectIDBackportAcceptsSupportedIdentifiers() {
+    if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+        _ = GlassEffectIDCallSite()
+    }
+}
 #endif

@@ -12,6 +12,7 @@
 
 - Preserve deployment targets: iOS 13, macOS 10.15, tvOS 13, watchOS 6, and visionOS 1.
 - Match `View.glassEffectID(_:in:)` with an `ID: Hashable & Sendable` generic identifier and `Namespace.ID` namespace.
+- Expose the method from iOS 14, macOS 11, tvOS 14, and watchOS 7, matching `Namespace.ID` availability.
 - Add no configuration parameters or additional public types.
 - Forward only on iOS, macOS, tvOS, and watchOS 26 or newer.
 - Return `content` unchanged on older systems and visionOS.
@@ -83,6 +84,7 @@ public extension Backport where Content: View {
     ///
     /// On Apple OS 26+ this forwards identity metadata to native Liquid Glass.
     /// On earlier OS versions and visionOS it leaves the content unchanged.
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     @MainActor
     @ViewBuilder
     func glassEffectID<ID: Hashable & Sendable>(
@@ -135,4 +137,3 @@ git add \
   Tests/LiquidGlassBackportTests/LiquidGlassBackportTests.swift
 git commit -m "feat(glass): add glass effect ID backport"
 ```
-

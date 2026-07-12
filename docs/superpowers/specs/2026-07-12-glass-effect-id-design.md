@@ -21,16 +21,17 @@ public extension Backport where Content: View {
 
 The generic constraint is equivalent to Apple's opaque
 `(some Hashable & Sendable)?` parameter. The backport adds no configuration
-parameters.
+parameters. The method is available on iOS 14, macOS 11, tvOS 14, and watchOS
+7 or newer because its `Namespace.ID` parameter has those availability floors.
 
 ## Runtime Behavior
 
 On iOS 26, macOS 26, tvOS 26, and watchOS 26 or newer, the modifier forwards
 the identifier and namespace to SwiftUI's native `glassEffectID(_:in:)`.
 
-On earlier supported operating systems, the modifier returns `content`
-unchanged. On visionOS it also returns `content`, because Apple does not expose
-the native modifier on that platform.
+On systems where `Namespace.ID` is available but the native modifier is not,
+the backport returns `content` unchanged. On visionOS it also returns `content`,
+because Apple does not expose the native modifier on that platform.
 
 A `nil` identifier is forwarded unchanged on supported systems and remains a
 no-op elsewhere.
