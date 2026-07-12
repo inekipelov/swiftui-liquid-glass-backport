@@ -150,6 +150,10 @@ Then add `LiquidGlassBackport` to your target dependencies:
 - [Liquid Glass overview](https://developer.apple.com/documentation/technologyoverviews/liquid-glass)
 - [Adopting Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass)
 
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for implemented APIs and planned backports.
+
 ## Related projects
 
 - [iOS-Backports](https://github.com/superwall/iOS-Backports) by [Superwall](https://github.com/superwall)
