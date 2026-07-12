@@ -66,6 +66,17 @@ Backported.GlassEffectContainer(spacing: 16) {
 }
 ```
 
+### Background extension
+
+Extend detail content beneath a system sidebar or inspector on Apple OS 26+:
+
+```swift
+BannerView()
+    .backport.backgroundExtensionEffect(isEnabled: true)
+```
+
+Earlier operating systems leave the view unchanged.
+
 ### Union and transitions
 
 `glassEffectID(_:in:)` and `glassEffectUnion(id:namespace:)` are available on

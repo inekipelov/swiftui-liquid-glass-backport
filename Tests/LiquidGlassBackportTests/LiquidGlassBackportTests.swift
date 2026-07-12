@@ -161,4 +161,15 @@ func glassEffectTransitionBackportSupportsAllVariants() {
     _ = Text("Materialize")
         .backport.glassEffectTransition(.materialize)
 }
+
+@Test("Backport backgroundExtensionEffect supports both overloads")
+@MainActor
+func backgroundExtensionEffectBackportSupportsBothOverloads() {
+    _ = Text("Default")
+        .backport.backgroundExtensionEffect()
+    _ = Text("Enabled")
+        .backport.backgroundExtensionEffect(isEnabled: true)
+    _ = Text("Disabled")
+        .backport.backgroundExtensionEffect(isEnabled: false)
+}
 #endif
