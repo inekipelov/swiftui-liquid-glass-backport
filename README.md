@@ -15,119 +15,36 @@ and provides its Liquid Glass configuration and view backports locally.
   <a href="https://developer.apple.com/visionos/"><img src="https://img.shields.io/badge/visionOS-1.0+-CAFC63?logo=apple" alt="visionOS 1.0+"></a>
 </p>
 
-## Usage
-
-Import the package once:
+## Quick Start
 
 ```swift
 import LiquidGlassBackport
-```
 
-### Glass configuration
-
-`Backported.Glass` mirrors SwiftUI's Liquid Glass configuration values:
-
-```swift
-let glass = Backported.Glass.regular
-    .tint(.blue)
-    .interactive()
-```
-
-Available variants are `.regular`, `.clear`, and `.identity`.
-For custom legacy fallbacks, the value also exposes `material`, `color`,
-`edgeColor`, and `shadowColor`.
-
-### View effects
-
-Apply Liquid Glass to a custom view with `.backport.glassEffect(_:in:)`:
-
-```swift
-Text("Liquid Glass")
-    .padding(16)
-    .backport.glassEffect(
-        .regular.tint(.blue).interactive(),
-        in: RoundedRectangle(cornerRadius: 16)
-    )
-```
-
-Use `Backported.GlassEffectContainer` to coordinate multiple effects. On
-Apple OS 26+, it forwards to SwiftUI's native container; earlier systems keep
-their content and individual effect fallbacks.
-
-```swift
-Backported.GlassEffectContainer(spacing: 16) {
-    Image(systemName: "pencil")
+Backported.GlassEffectContainer(spacing: 12) {
+    Text("Liquid Glass")
         .padding()
-        .backport.glassEffect()
+        .backport.glassEffect(.regular.tint(.blue).interactive())
 
-    Image(systemName: "note")
-        .padding()
-        .backport.glassEffect(.clear)
+    Button("Continue") {}
+        .buttonStyle(.backport.glassProminent)
 }
 ```
 
-### Background extension
+## Backported APIs
 
-Extend detail content beneath a system sidebar or inspector on Apple OS 26+:
-
-```swift
-BannerView()
-    .backport.backgroundExtensionEffect(isEnabled: true)
-```
-
-Earlier operating systems leave the view unchanged.
-
-### Union and transitions
-
-`glassEffectID(_:in:)` and `glassEffectUnion(id:namespace:)` are available on
-iOS 14, macOS 11, tvOS 14, and watchOS 7 or newer because they use
-`Namespace.ID`. `glassEffectTransition(_:)` accepts the package-owned
-`Backported.GlassEffectTransition` values:
-
-```swift
-struct ControlsView: View {
-    @Namespace private var glassNamespace
-
-    var body: some View {
-        Text("Action")
-            .padding()
-            .backport.glassEffect()
-            .backport.glassEffectID("action", in: glassNamespace)
-            .backport.glassEffectUnion(id: "controls", namespace: glassNamespace)
-            .backport.glassEffectTransition(.matchedGeometry)
-    }
-}
-```
-
-Available transition values are `.identity`, `.matchedGeometry`, and
-`.materialize`.
-
-### Button styles
-
-The package exposes glass button styles through the `backport` namespace:
-
-```swift
-Button("Glass") {}
-    .buttonStyle(.backport.glass)
-
-Button("Prominent") {}
-    .buttonStyle(.backport.glassProminent)
-
-Button("Configured") {}
-    .buttonStyle(.backport.glass(.regular.interactive().tint(.blue)))
-```
-
-On Apple OS 26+, these APIs forward to native SwiftUI Liquid Glass. Older
-systems use the package's platform-appropriate fallback or leave transition
-metadata unchanged when it has no visual equivalent.
-
-## Availability lifecycle
-
-On iOS, macOS, tvOS, and watchOS, Liquid Glass entry points and glass button
-styles are deprecated when an app raises its minimum deployment target to
-version 26 and become unavailable at version 27. This lets the compiler
-identify migration points to native SwiftUI APIs. visionOS remains exempt
-because Apple doesn't expose the same native Liquid Glass API surface there.
+| API | Backport behavior |
+| --- | --- |
+| `View.backport.glassEffect(_:in:)` | Uses native glass or a material-based fallback |
+| `Backported.GlassEffectContainer(spacing:content:)` | Uses the native container or preserves its content |
+| `View.backport.glassEffectID(_:in:)` | Uses native metadata or preserves its content |
+| `View.backport.glassEffectUnion(id:namespace:)` | Uses native metadata or preserves its content |
+| `Backported.GlassEffectTransition.identity`, `.matchedGeometry`, `.materialize` | Package-owned transition configuration |
+| `View.backport.glassEffectTransition(_:)` | Uses the native transition or preserves its content |
+| `View.backport.backgroundExtensionEffect()` | Uses the native effect or preserves its content |
+| `View.backport.backgroundExtensionEffect(isEnabled:)` | Uses the native effect or preserves its content |
+| `.buttonStyle(.backport.glass)` | Uses native glass or a bordered style |
+| `.buttonStyle(.backport.glassProminent)` | Uses native glass or a bordered prominent style |
+| `.buttonStyle(.backport.glass(_))` | Uses native configured glass or a bordered style |
 
 ## Installation
 
