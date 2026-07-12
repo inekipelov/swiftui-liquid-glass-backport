@@ -1,6 +1,6 @@
 import SwiftUI
 
-public extension Backport where Content: PrimitiveButtonStyle {
+extension Backport where Content: PrimitiveButtonStyle {
     /// A backport namespace entry for SwiftUI's borderless button style.
     @MainActor
     var borderless: some PrimitiveButtonStyle {

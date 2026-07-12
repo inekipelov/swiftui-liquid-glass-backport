@@ -53,9 +53,9 @@ func glassEffectContainerSupportsSpacingAndMultipleChildren() {
     _ = container
 }
 
-@Test("Button style backport exposes system fallback styles")
+@Test("Internal button style fallbacks remain available to glass styles")
 @MainActor
-func buttonStyleBackportExposesSystemFallbackStyles() {
+func internalButtonStyleFallbacksRemainAvailable() {
     _ = Button("Borderless") {}
         .buttonStyle(.backport.borderless)
     _ = Button("Bordered") {}

@@ -1,5 +1,9 @@
 import SwiftUI
 
+@available(iOS, deprecated: 26.0, obsoleted: 27.0, message: "Use SwiftUI's native button styles.")
+@available(macOS, deprecated: 26.0, obsoleted: 27.0, message: "Use SwiftUI's native button styles.")
+@available(tvOS, deprecated: 26.0, obsoleted: 27.0, message: "Use SwiftUI's native button styles.")
+@available(watchOS, deprecated: 26.0, obsoleted: 27.0, message: "Use SwiftUI's native button styles.")
 public extension Backport where Content: PrimitiveButtonStyle {
     /// A backport of SwiftUI's prominent glass button style.
     @MainActor
