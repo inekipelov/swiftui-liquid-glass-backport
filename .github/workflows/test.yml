@@ -1,0 +1,235 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: test-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SCHEME: swiftui-liquid-glass-backport
+
+jobs:
+  change-detection:
+    name: Change detection
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      code: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.code == 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Detect code changes
+        id: filter
+        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4
+        with:
+          filters: |
+            code:
+              - 'Sources/**'
+              - 'Tests/**'
+              - 'Package.swift'
+              - 'Package.resolved'
+              - '.github/workflows/test.yml'
+
+      - name: Report change detection
+        run: |
+          echo "Code changes detected: ${{ steps.filter.outputs.code }}"
+
+  swiftpm:
+    name: SwiftPM tests (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
+    needs: change-detection
+    if: needs.change-detection.outputs.code == 'true'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - macos-15
+          - macos-26
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Select Xcode 26
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for xcode in \
+            /Applications/Xcode_26.4.app \
+            /Applications/Xcode_26.4.1.app \
+            /Applications/Xcode_26.3.app \
+            /Applications/Xcode_26.2.app \
+            /Applications/Xcode_26.1.app \
+            /Applications/Xcode_26.0.app \
+            /Applications/Xcode.app
+          do
+            if [ -d "$xcode" ]; then
+              sudo xcode-select -s "$xcode/Contents/Developer"
+              break
+            fi
+          done
+
+          xcodebuild -version
+          swift --version
+
+      - name: Build package
+        run: swift build -v
+
+      - name: Run SwiftPM tests
+        run: swift test -v
+
+  apple-platform-tests:
+    name: Xcode tests (${{ matrix.name }})
+    runs-on: macos-26
+    needs: change-detection
+    if: needs.change-detection.outputs.code == 'true'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS 26
+            destination: platform=macOS
+          - name: iOS 26 simulator
+            destination: platform=iOS Simulator,name=iPhone 17
+          - name: tvOS 26 simulator
+            destination: platform=tvOS Simulator,name=Apple TV
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Select Xcode 26.4
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for xcode in \
+            /Applications/Xcode_26.4.app \
+            /Applications/Xcode_26.4.1.app \
+            /Applications/Xcode_26.3.app \
+            /Applications/Xcode.app
+          do
+            if [ -d "$xcode" ]; then
+              sudo xcode-select -s "$xcode/Contents/Developer"
+              break
+            fi
+          done
+
+          xcodebuild -version
+          xcodebuild -showsdks
+
+      - name: Run xcodebuild tests
+        run: |
+          xcodebuild test \
+            -scheme "$SCHEME" \
+            -destination "${{ matrix.destination }}" \
+            CODE_SIGNING_ALLOWED=NO
+
+  apple-platform-builds:
+    name: Xcode build (${{ matrix.name }})
+    runs-on: macos-26
+    needs: change-detection
+    if: needs.change-detection.outputs.code == 'true'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: watchOS 26 simulator
+            destination: generic/platform=watchOS Simulator
+          - name: visionOS 26 simulator
+            destination: generic/platform=visionOS Simulator
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Select Xcode 26.4
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for xcode in \
+            /Applications/Xcode_26.4.app \
+            /Applications/Xcode_26.4.1.app \
+            /Applications/Xcode_26.3.app \
+            /Applications/Xcode.app
+          do
+            if [ -d "$xcode" ]; then
+              sudo xcode-select -s "$xcode/Contents/Developer"
+              break
+            fi
+          done
+
+          xcodebuild -version
+          xcodebuild -showsdks
+
+      - name: Build platform target
+        run: |
+          xcodebuild build \
+            -scheme "$SCHEME" \
+            -destination "${{ matrix.destination }}" \
+            CODE_SIGNING_ALLOWED=NO
+
+  test-gate:
+    name: Test matrix
+    runs-on: ubuntu-latest
+    needs:
+      - change-detection
+      - swiftpm
+      - apple-platform-tests
+      - apple-platform-builds
+    if: always()
+    env:
+      CODE_CHANGES: ${{ needs.change-detection.outputs.code }}
+      CHANGE_DETECTION_RESULT: ${{ needs.change-detection.result }}
+      SWIFTPM_RESULT: ${{ needs.swiftpm.result }}
+      APPLE_PLATFORM_TESTS_RESULT: ${{ needs.apple-platform-tests.result }}
+      APPLE_PLATFORM_BUILDS_RESULT: ${{ needs.apple-platform-builds.result }}
+
+    steps:
+      - name: Validate test matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$CHANGE_DETECTION_RESULT" != "success" ]]; then
+            echo "Change detection did not succeed: $CHANGE_DETECTION_RESULT" >&2
+            exit 1
+          fi
+
+          results=(
+            "$SWIFTPM_RESULT"
+            "$APPLE_PLATFORM_TESTS_RESULT"
+            "$APPLE_PLATFORM_BUILDS_RESULT"
+          )
+
+          for result in "${results[@]}"; do
+            if [[ "$CODE_CHANGES" == "true" && "$result" != "success" ]]; then
+              echo "A required test job did not succeed: $result" >&2
+              exit 1
+            fi
+
+            if [[ "$CODE_CHANGES" != "true" && "$result" != "skipped" ]]; then
+              echo "A documentation-only test job was not skipped: $result" >&2
+              exit 1
+            fi
+          done

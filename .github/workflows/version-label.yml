@@ -1,0 +1,43 @@
+name: Version Label
+
+on:
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+      - unlabeled
+      - ready_for_review
+
+concurrency:
+  group: version-label-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  version-label:
+    name: Version label
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout trusted default branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Validate version label
+        env:
+          LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t labels < <(jq -r '.[]' <<< "$LABELS_JSON")
+          selected_label=$(scripts/version-label.sh "${labels[@]}")
+          echo "Selected version label: $selected_label"
