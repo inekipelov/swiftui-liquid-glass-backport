@@ -45,12 +45,14 @@ assert_output 26.0.0 "$next_script" version:major
 assert_output 26.0.0 "$next_script" version:minor
 assert_output 26.0.0 "$next_script" version:patch
 assert_output '' "$next_script" version:none
+assert_output 30.0.0 env INITIAL_VERSION=30.0.0 "$next_script" version:minor
 assert_output 27.0.0 "$next_script" version:major 26.4.3
 assert_output 26.5.0 "$next_script" version:minor 26.4.3
 assert_output 26.4.4 "$next_script" version:patch 26.4.3
 assert_output '' "$next_script" version:none 26.4.3
 assert_failure "$next_script" version:unknown 26.4.3
 assert_failure "$next_script" version:patch 26.4
+assert_failure env INITIAL_VERSION=026.0.0 "$next_script" version:patch
 
 assert_output '' "$latest_script"
 assert_output 26.10.2 "$latest_script" notes 26.2.9 26.10.2
