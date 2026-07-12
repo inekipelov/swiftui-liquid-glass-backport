@@ -161,5 +161,6 @@ and release requirements.
 
 ## Related projects
 
+- [UniversalGlass](https://github.com/Aeastr/UniversalGlass) by [Aeastr](https://github.com/Aeastr)
 - [iOS-Backports](https://github.com/superwall/iOS-Backports) by [Superwall](https://github.com/superwall)
 - [SwiftUIBackports](https://github.com/shaps80/SwiftUIBackports) by [Shaps Benon](https://github.com/shaps80)
