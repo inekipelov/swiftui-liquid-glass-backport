@@ -138,4 +138,27 @@ func glassEffectUnionBackportAcceptsSupportedIdentifiers() {
         _ = GlassEffectUnionCallSite()
     }
 }
+
+@Test("Backport glassEffectTransition(_:) supports all transition variants")
+@MainActor
+func glassEffectTransitionBackportSupportsAllVariants() {
+    let transitions: [Backported.GlassEffectTransition] = [
+        .identity,
+        .matchedGeometry,
+        .materialize
+    ]
+
+    for transition in transitions {
+        let view = Text("Liquid Glass")
+            .backport.glassEffect()
+            .backport.glassEffectTransition(transition)
+
+        _ = view
+    }
+
+    _ = Text("Matched Geometry")
+        .backport.glassEffectTransition(.matchedGeometry)
+    _ = Text("Materialize")
+        .backport.glassEffectTransition(.materialize)
+}
 #endif
