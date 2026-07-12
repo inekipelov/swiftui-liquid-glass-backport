@@ -51,6 +51,13 @@ older Apple platforms and OS releases.
 
 - [ ] Implement `Backported.ToolbarSpacer` with a native forwarding path.
 - [ ] Provide a neutral `Spacer` fallback for `ToolbarSpacer`.
+- [ ] Implement `Backported.DefaultToolbarItem`.
+- [ ] Add `Backported.ToolbarDefaultItemKind.search`.
+- [ ] Add `Backported.ToolbarDefaultItemKind.sidebarToggle`.
+- [ ] Add `Backported.ToolbarDefaultItemKind.title`.
+- [ ] Implement `View.backport.toolbar(removing:)` for default toolbar items.
+- [ ] Implement `ToolbarContent.backport.sharedBackgroundVisibility(_:)`.
+- [ ] Implement `CustomizableToolbarContent.backport.sharedBackgroundVisibility(_:)`.
 - [ ] Implement `View.backport.tabViewBottomAccessory`.
 - [ ] Add `TabViewBottomAccessoryPlacement` compatibility.
 - [ ] Add `Backported.TabRole.automatic`.
@@ -59,6 +66,10 @@ older Apple platforms and OS releases.
 - [ ] Preserve ordinary `TabView` navigation when tab roles are unavailable.
 - [ ] Implement `View.backport.tabBarMinimizeBehavior(_:)`.
 - [ ] Implement `View.backport.toolbarMinimizeBehavior(_:for:)` where the API is part of the supported deployment scope.
+- [ ] Implement `Backported.ToolbarOverflowMenu`.
+- [ ] Implement `View.backport.toolbarOverflowMenu(content:)`.
+- [ ] Implement `ToolbarContent.backport.visibilityPriority(_:)`.
+- [ ] Add `ToolbarItemPlacement.backport.topBarPinnedTrailing` compatibility.
 - [ ] Add compile-smoke coverage for tab roles, accessories, and toolbar content.
 
 ## visionOS Glass
