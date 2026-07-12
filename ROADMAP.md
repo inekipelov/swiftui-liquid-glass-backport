@@ -14,6 +14,11 @@ older Apple platforms and OS releases.
 - [x] Test iOS, tvOS, watchOS, and visionOS package compatibility in GitHub Actions.
 - [x] Skip the expensive CI matrix for documentation-only pull requests.
 - [x] Cancel obsolete CI runs for the same pull request or ref.
+- [x] Require exactly one version label on every pull request.
+- [x] Calculate Apple-platform-aligned calendar versions with tested scripts.
+- [x] Publish annotated tags and GitHub Releases after merge into `main`.
+- [x] Provide a dry-run mode for release calculation.
+- [x] Document contribution, compatibility, and release requirements.
 
 ## Liquid Glass Effects
 

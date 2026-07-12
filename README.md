@@ -134,7 +134,7 @@ because Apple doesn't expose the same native Liquid Glass API surface there.
 Add the package to your `Package.swift` dependencies:
 
 ```swift
-.package(url: "https://github.com/inekipelov/swiftui-liquid-glass-backport.git", from: "0.1.0")
+.package(url: "https://github.com/inekipelov/swiftui-liquid-glass-backport.git", from: "26.0.0")
 ```
 
 Then add `LiquidGlassBackport` to your target dependencies:
@@ -153,6 +153,11 @@ Then add `LiquidGlassBackport` to your target dependencies:
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md) for implemented APIs and planned backports.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development, testing, versioning,
+and release requirements.
 
 ## Related projects
 
