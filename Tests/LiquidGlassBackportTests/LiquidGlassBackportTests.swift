@@ -109,4 +109,33 @@ func glassEffectIDBackportAcceptsSupportedIdentifiers() {
         _ = GlassEffectIDCallSite()
     }
 }
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+private struct GlassEffectUnionCallSite: View {
+    @Namespace private var namespace
+
+    var body: some View {
+        VStack {
+            Text("String")
+                .backport.glassEffectUnion(id: "string", namespace: namespace)
+            Text("Custom")
+                .backport.glassEffectUnion(
+                    id: GlassEffectIDTestIdentifier(rawValue: 1),
+                    namespace: namespace
+                )
+
+            let identifier: String? = nil
+            Text("Nil")
+                .backport.glassEffectUnion(id: identifier, namespace: namespace)
+        }
+    }
+}
+
+@Test("Backport glassEffectUnion(id:namespace:) accepts supported identifiers")
+@MainActor
+func glassEffectUnionBackportAcceptsSupportedIdentifiers() {
+    if #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *) {
+        _ = GlassEffectUnionCallSite()
+    }
+}
 #endif
