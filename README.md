@@ -38,7 +38,6 @@ Backported.GlassEffectContainer(spacing: 12) {
 | `Backported.GlassEffectContainer(spacing:content:)` | Uses the native container or preserves its content |
 | `View.backport.glassEffectID(_:in:)` | Uses native metadata or preserves its content |
 | `View.backport.glassEffectUnion(id:namespace:)` | Uses native metadata or preserves its content |
-| `Backported.GlassEffectTransition.identity`, `.matchedGeometry`, `.materialize` | Package-owned transition configuration |
 | `View.backport.glassEffectTransition(_:)` | Uses the native transition or preserves its content |
 | `View.backport.backgroundExtensionEffect()` | Uses the native effect or preserves its content |
 | `View.backport.backgroundExtensionEffect(isEnabled:)` | Uses the native effect or preserves its content |

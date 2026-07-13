@@ -44,6 +44,22 @@ older Apple platforms and OS releases.
 - [x] Keep system button-style fallbacks internal to the library.
 - [x] Remove the external ButtonStyleBackport dependency.
 
+## Search UI
+
+- [ ] Add `Backported.SearchToolbarBehavior.automatic` and `.minimize`.
+- [ ] Implement `View.backport.searchToolbarBehavior(_:)` with a no-op fallback.
+- [ ] Add `Backported.SearchPresentationToolbarBehavior.automatic` and `.avoidHidingContent`.
+- [ ] Implement `View.backport.searchPresentationToolbarBehavior(_:)` with a no-op fallback.
+- [ ] Add `Backported.SpacerSizing.fixed` and `.flexible`.
+- [ ] Implement `Backported.ToolbarSpacer(_:placement:)` with a neutral older-system fallback.
+- [ ] Add `Backported.ToolbarDefaultItemKind.search`.
+- [ ] Implement `Backported.DefaultToolbarItem(kind:placement:)` without emulating a custom search field on older systems.
+- [ ] Add `Backported.TabRole.search`.
+- [ ] Add a `SwiftUI.Tab` initializer overload that accepts `Backported.TabRole`.
+- [ ] Forward the search tab role on iOS 26 and ignore it on iOS 18 through iOS 25.
+- [ ] Add compile-smoke coverage for search configuration, toolbar content, and the search tab role.
+- [ ] Add usage examples for toolbar search and search-tab placement.
+
 ## Scroll and Safe-Area Chrome
 
 - [ ] Implement `View.backport.scrollEdgeEffectStyle(_:for:)`.
@@ -54,10 +70,6 @@ older Apple platforms and OS releases.
 
 ## Toolbar and Tab Navigation
 
-- [ ] Implement `Backported.ToolbarSpacer` with a native forwarding path.
-- [ ] Provide a neutral `Spacer` fallback for `ToolbarSpacer`.
-- [ ] Implement `Backported.DefaultToolbarItem`.
-- [ ] Add `Backported.ToolbarDefaultItemKind.search`.
 - [ ] Add `Backported.ToolbarDefaultItemKind.sidebarToggle`.
 - [ ] Add `Backported.ToolbarDefaultItemKind.title`.
 - [ ] Implement `View.backport.toolbar(removing:)` for default toolbar items.
@@ -66,7 +78,6 @@ older Apple platforms and OS releases.
 - [ ] Implement `View.backport.tabViewBottomAccessory`.
 - [ ] Add `TabViewBottomAccessoryPlacement` compatibility.
 - [ ] Add `Backported.TabRole.automatic`.
-- [ ] Add `Backported.TabRole.search`.
 - [ ] Add `Backported.TabRole.prominent` for newer systems.
 - [ ] Preserve ordinary `TabView` navigation when tab roles are unavailable.
 - [ ] Implement `View.backport.tabBarMinimizeBehavior(_:)`.
