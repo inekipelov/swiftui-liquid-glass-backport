@@ -44,6 +44,17 @@ older Apple platforms and OS releases.
 - [x] Keep system button-style fallbacks internal to the library.
 - [x] Remove the external ButtonStyleBackport dependency.
 
+## Search UI
+
+- [x] Add `Backported.SearchToolbarBehavior.automatic` and `.minimize`.
+- [x] Implement `View.backport.searchToolbarBehavior(_:)` with a no-op fallback.
+- [x] Add `Backported.SpacerSizing.fixed` and `.flexible`.
+- [x] Implement `Backported.ToolbarSpacer(_:placement:)` with a best-effort SwiftUI `Spacer` fallback on older systems.
+- [x] Add `Backported.ToolbarDefaultItemKind.search`.
+- [x] Implement `Backported.DefaultToolbarItem(kind:placement:)` without emulating a custom search field on older systems.
+- [x] Add compile-smoke coverage for search configuration and toolbar content.
+- [x] Add a toolbar search usage example.
+
 ## Scroll and Safe-Area Chrome
 
 - [ ] Implement `View.backport.scrollEdgeEffectStyle(_:for:)`.
@@ -54,10 +65,6 @@ older Apple platforms and OS releases.
 
 ## Toolbar and Tab Navigation
 
-- [ ] Implement `Backported.ToolbarSpacer` with a native forwarding path.
-- [ ] Provide a neutral `Spacer` fallback for `ToolbarSpacer`.
-- [ ] Implement `Backported.DefaultToolbarItem`.
-- [ ] Add `Backported.ToolbarDefaultItemKind.search`.
 - [ ] Add `Backported.ToolbarDefaultItemKind.sidebarToggle`.
 - [ ] Add `Backported.ToolbarDefaultItemKind.title`.
 - [ ] Implement `View.backport.toolbar(removing:)` for default toolbar items.
@@ -66,7 +73,6 @@ older Apple platforms and OS releases.
 - [ ] Implement `View.backport.tabViewBottomAccessory`.
 - [ ] Add `TabViewBottomAccessoryPlacement` compatibility.
 - [ ] Add `Backported.TabRole.automatic`.
-- [ ] Add `Backported.TabRole.search`.
 - [ ] Add `Backported.TabRole.prominent` for newer systems.
 - [ ] Preserve ordinary `TabView` navigation when tab roles are unavailable.
 - [ ] Implement `View.backport.tabBarMinimizeBehavior(_:)`.

@@ -172,4 +172,65 @@ func backgroundExtensionEffectBackportSupportsBothOverloads() {
     _ = Text("Disabled")
         .backport.backgroundExtensionEffect(isEnabled: false)
 }
+
+@Test("Backport searchToolbarBehavior supports native behavior values")
+@MainActor
+func searchToolbarBehaviorBackportSupportsNativeBehaviorValues() {
+    _ = Text("Search")
+        .backport.searchToolbarBehavior(.automatic)
+
+    #if os(iOS) || os(visionOS)
+    _ = Text("Search")
+        .backport.searchToolbarBehavior(.minimize)
+    #endif
+}
+
+#if os(iOS) || os(macOS)
+@available(iOS 17.5, macOS 14.5, *)
+private struct ToolbarSpacerCallSite: View {
+    var body: some View {
+        Text("Toolbar")
+            .toolbar {
+                Backported.ToolbarSpacer()
+                Backported.ToolbarSpacer(.fixed, placement: .primaryAction)
+                Backported.ToolbarSpacer(.flexible)
+            }
+            .toolbar(id: "search-toolbar") {
+                Backported.ToolbarSpacer(.fixed)
+            }
+    }
+}
+
+@Test("Backported ToolbarSpacer supports native sizing and placement")
+@MainActor
+func toolbarSpacerBackportSupportsNativeSizingAndPlacement() {
+    if #available(iOS 17.5, macOS 14.5, *) {
+        _ = ToolbarSpacerCallSite()
+    }
+}
+#endif
+
+#if os(iOS) || os(macOS) || os(visionOS)
+@available(iOS 17.5, macOS 14.5, visionOS 1.0, *)
+private struct DefaultSearchToolbarItemCallSite: View {
+    var body: some View {
+        Text("Search")
+            .toolbar {
+                Backported.DefaultToolbarItem(kind: .search)
+                Backported.DefaultToolbarItem(
+                    kind: .search,
+                    placement: .primaryAction
+                )
+            }
+    }
+}
+
+@Test("Backported DefaultToolbarItem supports the search item kind")
+@MainActor
+func defaultToolbarItemBackportSupportsSearchItemKind() {
+    if #available(iOS 17.5, macOS 14.5, visionOS 1.0, *) {
+        _ = DefaultSearchToolbarItemCallSite()
+    }
+}
+#endif
 #endif
