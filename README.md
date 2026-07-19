@@ -45,7 +45,7 @@ Backported.GlassEffectContainer(spacing: 12) {
 | `.buttonStyle(.backport.glassProminent)` | Uses native glass or a bordered prominent style |
 | `.buttonStyle(.backport.glass(_))` | Uses native configured glass or a bordered style |
 | `View.backport.searchToolbarBehavior(_:)` | Uses native search toolbar behavior or preserves its content |
-| `Backported.ToolbarSpacer(_:placement:)` | Uses the native spacer or empty toolbar content |
+| `Backported.ToolbarSpacer(_:placement:)` | Uses the native spacer or a best-effort SwiftUI `Spacer` item |
 | `Backported.DefaultToolbarItem(kind:placement:)` | Uses the native default search item or empty toolbar content |
 
 ### Search toolbar

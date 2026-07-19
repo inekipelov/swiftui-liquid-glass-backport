@@ -5,8 +5,9 @@ native forwarding and neutral older-system fallbacks.
 
 **Architecture:** Package-owned values mirror the native SwiftUI API shape.
 View modifiers forward on Apple OS 26 and preserve their content earlier.
-Toolbar-content wrappers forward on supported OS 26 platforms and otherwise
-emit empty toolbar items; their minimum versions follow SwiftUI's safe
+`ToolbarSpacer` forwards on supported OS 26 platforms and otherwise emits a
+toolbar item containing `Spacer`; `DefaultToolbarItem` continues to emit empty
+toolbar content. Their minimum versions follow SwiftUI's safe
 limited-availability `ToolbarContent` support.
 
 **Tech Stack:** Swift 6, SwiftUI, Swift Testing, SwiftPM
@@ -37,8 +38,8 @@ limited-availability `ToolbarContent` support.
 - [x] Add a failing compile-smoke test for both sizing values, default
   arguments, explicit sizing, and placement.
 - [x] Add `Backported.SpacerSizing` and native bridging on iOS 26 and macOS 26.
-- [x] Add `Backported.ToolbarSpacer` with native forwarding and empty toolbar
-  content on older systems.
+- [x] Add `Backported.ToolbarSpacer` with native forwarding and a best-effort
+  SwiftUI `Spacer` toolbar item on older systems.
 - [x] Run `swift test`.
 
 ## Task 3: Default search toolbar item

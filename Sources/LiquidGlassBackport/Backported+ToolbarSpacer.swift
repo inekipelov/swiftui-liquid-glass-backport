@@ -10,7 +10,7 @@ public extension Backported {
     /// Backport of SwiftUI `ToolbarSpacer`.
     ///
     /// On iOS 26 and macOS 26 this forwards to SwiftUI. On earlier systems it
-    /// inserts empty customizable toolbar content.
+    /// inserts a customizable toolbar item containing a best-effort `Spacer`.
     struct ToolbarSpacer: ToolbarContent, CustomizableToolbarContent {
         private let sizing: SpacerSizing
         private let placement: ToolbarItemPlacement
@@ -35,12 +35,12 @@ public extension Backported {
                 )
             } else {
                 ToolbarItem(id: fallbackID, placement: placement) {
-                    EmptyView()
+                    Spacer()
                 }
             }
             #else
             ToolbarItem(id: fallbackID, placement: placement) {
-                EmptyView()
+                Spacer()
             }
             #endif
         }

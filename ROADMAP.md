@@ -49,7 +49,7 @@ older Apple platforms and OS releases.
 - [x] Add `Backported.SearchToolbarBehavior.automatic` and `.minimize`.
 - [x] Implement `View.backport.searchToolbarBehavior(_:)` with a no-op fallback.
 - [x] Add `Backported.SpacerSizing.fixed` and `.flexible`.
-- [x] Implement `Backported.ToolbarSpacer(_:placement:)` with a neutral older-system fallback.
+- [x] Implement `Backported.ToolbarSpacer(_:placement:)` with a best-effort SwiftUI `Spacer` fallback on older systems.
 - [x] Add `Backported.ToolbarDefaultItemKind.search`.
 - [x] Implement `Backported.DefaultToolbarItem(kind:placement:)` without emulating a custom search field on older systems.
 - [x] Add compile-smoke coverage for search configuration and toolbar content.
