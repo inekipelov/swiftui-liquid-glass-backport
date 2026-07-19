@@ -46,19 +46,14 @@ older Apple platforms and OS releases.
 
 ## Search UI
 
-- [ ] Add `Backported.SearchToolbarBehavior.automatic` and `.minimize`.
-- [ ] Implement `View.backport.searchToolbarBehavior(_:)` with a no-op fallback.
-- [ ] Add `Backported.SearchPresentationToolbarBehavior.automatic` and `.avoidHidingContent`.
-- [ ] Implement `View.backport.searchPresentationToolbarBehavior(_:)` with a no-op fallback.
-- [ ] Add `Backported.SpacerSizing.fixed` and `.flexible`.
-- [ ] Implement `Backported.ToolbarSpacer(_:placement:)` with a neutral older-system fallback.
-- [ ] Add `Backported.ToolbarDefaultItemKind.search`.
-- [ ] Implement `Backported.DefaultToolbarItem(kind:placement:)` without emulating a custom search field on older systems.
-- [ ] Add `Backported.TabRole.search`.
-- [ ] Add a `SwiftUI.Tab` initializer overload that accepts `Backported.TabRole`.
-- [ ] Forward the search tab role on iOS 26 and ignore it on iOS 18 through iOS 25.
-- [ ] Add compile-smoke coverage for search configuration, toolbar content, and the search tab role.
-- [ ] Add usage examples for toolbar search and search-tab placement.
+- [x] Add `Backported.SearchToolbarBehavior.automatic` and `.minimize`.
+- [x] Implement `View.backport.searchToolbarBehavior(_:)` with a no-op fallback.
+- [x] Add `Backported.SpacerSizing.fixed` and `.flexible`.
+- [x] Implement `Backported.ToolbarSpacer(_:placement:)` with a neutral older-system fallback.
+- [x] Add `Backported.ToolbarDefaultItemKind.search`.
+- [x] Implement `Backported.DefaultToolbarItem(kind:placement:)` without emulating a custom search field on older systems.
+- [x] Add compile-smoke coverage for search configuration and toolbar content.
+- [x] Add a toolbar search usage example.
 
 ## Scroll and Safe-Area Chrome
 

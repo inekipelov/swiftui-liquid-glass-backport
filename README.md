@@ -44,6 +44,35 @@ Backported.GlassEffectContainer(spacing: 12) {
 | `.buttonStyle(.backport.glass)` | Uses native glass or a bordered style |
 | `.buttonStyle(.backport.glassProminent)` | Uses native glass or a bordered prominent style |
 | `.buttonStyle(.backport.glass(_))` | Uses native configured glass or a bordered style |
+| `View.backport.searchToolbarBehavior(_:)` | Uses native search toolbar behavior or preserves its content |
+| `Backported.ToolbarSpacer(_:placement:)` | Uses the native spacer or empty toolbar content |
+| `Backported.DefaultToolbarItem(kind:placement:)` | Uses the native default search item or empty toolbar content |
+
+### Search toolbar
+
+```swift
+@available(iOS 17.5, *)
+struct SearchScreen: View {
+    @State private var query = ""
+
+    var body: some View {
+        NavigationStack {
+            ResultsView(query: query)
+                .searchable(text: $query)
+                .backport.searchToolbarBehavior(.minimize)
+                .toolbar {
+                    Backported.ToolbarSpacer(.fixed)
+                    Backported.DefaultToolbarItem(kind: .search)
+                }
+        }
+    }
+}
+```
+
+`ToolbarSpacer` is available from iOS 17.5 and macOS 14.5.
+`DefaultToolbarItem` with `.search` additionally supports visionOS 1 and later.
+On older supported releases these toolbar-content APIs are neutral placeholders;
+the existing `searchable` modifier remains responsible for search behavior.
 
 ## Installation
 
@@ -65,6 +94,7 @@ Then add `LiquidGlassBackport` to your target dependencies:
 
 - [Liquid Glass overview](https://developer.apple.com/documentation/technologyoverviews/liquid-glass)
 - [Adopting Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass)
+- [Applying Liquid Glass to custom views](https://developer.apple.com/documentation/SwiftUI/Applying-Liquid-Glass-to-custom-views)
 
 ## Roadmap
 

@@ -1,5 +1,9 @@
 # iOS 26 Search UI Roadmap Implementation Plan
 
+> Superseded by `docs/plans/2026-07-18-search-ui-backports.md` after Xcode
+> 26.5 SDK verification showed that `SearchPresentationToolbarBehavior` and
+> `TabRole.search` predate iOS 26.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Document the iOS 26 SwiftUI Search UI backport scope and remove the requested transition-value row from the README API table.
@@ -25,7 +29,7 @@
 - Modify: `ROADMAP.md:43-65`
 
 **Interfaces:**
-- Consumes: the approved API inventory in `docs/superpowers/specs/2026-07-13-search-ui-roadmap-design.md`
+- Consumes: the approved API inventory in `docs/specs/2026-07-13-search-ui-roadmap-design.md`
 - Produces: a dedicated `## Search UI` roadmap section naming every approved type, value, initializer, modifier, fallback, and verification requirement
 
 - [ ] **Step 1: Remove the transition-value table row from README**
@@ -102,7 +106,6 @@ Expected: `git diff --check` exits 0 and the diff contains only the requested RE
 - [ ] **Step 6: Commit the documentation changes**
 
 ```bash
-git add README.md ROADMAP.md docs/superpowers/plans/2026-07-13-search-ui-roadmap.md
+git add README.md ROADMAP.md docs/plans/2026-07-13-search-ui-roadmap.md
 git commit -m "docs: expand iOS 26 search UI roadmap"
 ```
-
