@@ -9,57 +9,38 @@ private struct CustomViewsPreview: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                colors: [.blue, .purple, .pink],
+                colors: [.indigo, .pink, .orange, .cyan],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
 
-            Backported.GlassEffectContainer(spacing: 20) {
-                VStack(spacing: 20) {
-                    HStack(spacing: 20) {
-                        badge(
-                            "sun.max.fill",
-                            id: "sun",
-                            tint: .orange
-                        )
+            VStack {
+                Backported.GlassEffectContainer(spacing: 40.0) {
+                    HStack(spacing: 40.0) {
+                        Image(systemName: "scribble.variable")
+                            .frame(width: 80.0, height: 80.0)
+                            .font(.system(size: 36))
+                            .backport.glassEffect()
+                            .backport.glassEffectID("pencil", in: namespace)
+
 
                         if isExpanded {
-                            badge(
-                                "cloud.rain.fill",
-                                id: "rain",
-                                tint: .blue
-                            )
-                            badge(
-                                "wind",
-                                id: "wind",
-                                tint: .mint
-                            )
+                            Image(systemName: "eraser.fill")
+                                .frame(width: 80.0, height: 80.0)
+                                .font(.system(size: 36))
+                                .backport.glassEffect()
+                                .backport.glassEffectID("eraser", in: namespace)
                         }
                     }
-
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.35)) {
-                            isExpanded.toggle()
-                        }
-                    } label: {
-                        Label(
-                            isExpanded ? "Collapse" : "Expand",
-                            systemImage: isExpanded
-                                ? "rectangle.compress.vertical"
-                                : "rectangle.expand.vertical"
-                        )
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 12)
-                    }
-                    .buttonStyle(.plain)
-                    .backport.glassEffect(
-                        .regular.tint(.purple).interactive(),
-                        in: Capsule()
-                    )
-                    .backport.glassEffectID("toggle", in: namespace)
-                    .backport.glassEffectTransition(.matchedGeometry)
                 }
+
+                Button("Toggle") {
+                    withAnimation {
+                        isExpanded.toggle()
+                    }
+                }
+                .buttonStyle(.backport.glass)
             }
         }
     }

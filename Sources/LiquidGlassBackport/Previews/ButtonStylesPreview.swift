@@ -6,7 +6,7 @@ private struct ButtonStylesPreview: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                colors: [.indigo, .cyan, .orange],
+                colors: [.indigo, .pink, .orange, .cyan],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
